@@ -75,19 +75,28 @@ export const SpeechRecorderModal: FC<SpeechRecorderModalProps> = ({ visible, onC
 
   return (
     <Modal title="Speech Recorder" open={visible} onCancel={onCancel} footer={null} destroyOnClose>
-      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-        <div style={{ display: "flex", gap: 8 }}>
-          <Button type="primary" onClick={startRecording} icon={<IconMicrophone />} danger={recording}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 8, alignItems: "center" }}>
+        <div style={{ display: "flex", gap: 8, justifyContent: "center" }}>
+          <Button
+            type="primary"
+            onClick={startRecording}
+            danger={recording}
+            style={{ display: "flex", alignItems: "center", justifyContent: "center" }}
+            icon={<IconMicrophone />}
+          >
             {recording ? "Stop" : audioUrl ? "Re-record" : "Record"}
           </Button>
-          <Button onClick={play} icon={<IconPlay />} disabled={!audioUrl}>
-            Play
-          </Button>
-          <Button type="primary" onClick={handleDone} disabled={!transcript}>
+          <Button
+            onClick={play}
+            disabled={!audioUrl}
+            style={{ display: "flex", alignItems: "center", justifyContent: "center" }}
+            icon={<IconPlay />}
+          />
+          <Button type="primary" onClick={handleDone}>
             Done
           </Button>
         </div>
-        <audio controls ref={audioRef} src={audioUrl}>
+        <audio controls ref={audioRef} src={audioUrl} style={{ alignSelf: "center", background: "transparent" }}>
           <track kind="captions" />
         </audio>
       </div>
