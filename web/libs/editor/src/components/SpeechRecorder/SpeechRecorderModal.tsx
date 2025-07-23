@@ -96,7 +96,18 @@ export const SpeechRecorderModal: FC<SpeechRecorderModalProps> = ({ visible, onC
             Done
           </Button>
         </div>
-        <audio controls ref={audioRef} src={audioUrl} style={{ alignSelf: "center", background: "transparent" }}>
+        <audio
+          ref={audioRef}
+          src={audioUrl}
+          controls
+          style={{
+            alignSelf: "center",
+            backgroundColor: "transparent",
+            border: "none",
+            outline: "none",
+            boxShadow: "none",
+          }}
+        >
           <track kind="captions" />
         </audio>
       </div>
