@@ -1,9 +1,8 @@
 import chroma from "chroma-js";
 import { observer } from "mobx-react";
 import { type FC, forwardRef, useMemo, useState } from "react";
-import { IconRelationLink, IconPlus, IconTrash, IconWarning, IconEyeClosed, IconEyeOpened } from "@humansignal/icons";
+import { IconPlus, IconTrash, IconWarning } from "@humansignal/icons";
 import { Button, type ButtonProps } from "@humansignal/ui";
-import { CREATE_RELATION_MODE } from "../../../stores/Annotation/LinkingModes";
 import { Block, Elem } from "../../../utils/bem";
 import { NodeIcon } from "../../Node/Node";
 import { LockButton } from "../Components/LockButton";
@@ -97,34 +96,13 @@ const RegionAction: FC<any> = observer(({ region, annotation, editMode, onEditMo
   const entityButtons: JSX.Element[] = [];
 
   entityButtons.push(
-    <WithHotkey binging="region:relation">
-      <RegionActionButton
-        key="relation"
-        variant={annotation.isLinkingMode ? "primary" : "neutral"}
-        look={annotation.isLinkingMode ? "filled" : "string"}
-        onClick={(_e: any, hotkey?: any) => {
-          // If this is triggered by a hotkey, defer to the global bound handler for relations to avoid contention.
-          if (hotkey) return;
-          if (annotation.isLinkingMode) {
-            annotation.stopLinkingMode();
-          } else {
-            annotation.startLinkingMode(CREATE_RELATION_MODE, region);
-          }
-        }}
-        aria-label="Create Relation"
-      >
-        <IconRelationLink />
-      </RegionActionButton>
-    </WithHotkey>,
-  );
-
-  entityButtons.push(
     <WithHotkey binging="region:meta">
       <RegionActionButton
         key="meta"
         look={editMode ? "filled" : "string"}
         variant={editMode ? "primary" : "neutral"}
         onClick={() => onEditModeChange(!editMode)}
+        disabled={region.isReadOnly()}
         aria-label="Edit region's meta"
       >
         <IconPlus />
@@ -148,12 +126,6 @@ const RegionAction: FC<any> = observer(({ region, annotation, editMode, onEditMo
           look="string"
           style={{ width: 36, height: 32 }}
         />
-        <RegionActionButton
-          aria-label={`${region.hidden ? "Show" : "Hide"} selected region`}
-          onClick={region.toggleHidden}
-        >
-          {region.hidden ? <IconEyeClosed /> : <IconEyeOpened />}
-        </RegionActionButton>
         <RegionActionButton
           variant="negative"
           aria-label="Delete selected region"

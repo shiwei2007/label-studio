@@ -22,18 +22,13 @@ export const LockButton: FC<{
   const isRegionReadonly = item.isReadOnly() && !locked;
 
   if (isFF(FF_DEV_3873)) {
-    const styles = {
-      ...style,
-      display: item.isReadOnly() || locked ? undefined : "none",
-    };
-
     return (
       <RegionControlButton
         disabled={isRegionReadonly}
         onClick={onClick}
         hotkey={hotkey as HotkeyList}
         look={look}
-        style={styles}
+        style={style}
       >
         {isLocked ? <IconLockLocked /> : <IconLockUnlocked />}
       </RegionControlButton>

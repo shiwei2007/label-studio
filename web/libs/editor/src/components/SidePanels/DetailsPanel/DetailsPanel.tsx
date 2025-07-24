@@ -211,7 +211,11 @@ const RegionsPanel: FC<{ regions: any }> = observer(function RegionsPanel({ regi
 });
 
 const SelectedRegion: FC<{ region: any }> = observer(function SelectedRegion({ region }: { region: any }): JSX.Element {
-  return <RegionItem region={region} mainDetails={RegionDetailsMain} metaDetails={RegionDetailsMeta} />;
+  return (
+    <div className="selected-region">
+      <RegionItem region={region} mainDetails={RegionDetailsMain} metaDetails={RegionDetailsMeta} />
+    </div>
+  );
 });
 
 export const Comments = CommentsTab;

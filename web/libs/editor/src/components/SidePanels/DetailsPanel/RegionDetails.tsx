@@ -131,7 +131,7 @@ export const RegionDetailsMeta: FC<RegionDetailsMetaProps> = observer(({ region,
 
   const saveComment = (value: string) => {
     const text = value.trim();
-    if (text) {
+    if (text && !region.isReadOnly()) {
       const user = currentUser?.displayName || currentUser?.username || "User";
       region.addMetaComment(user, text);
     }
@@ -139,6 +139,7 @@ export const RegionDetailsMeta: FC<RegionDetailsMetaProps> = observer(({ region,
   };
 
   const [recorderVisible, setRecorderVisible] = useState(false);
+  const ignoreBlurRef = useRef(false);
   const appendVoiceText = useCallback((voiceText: string) => {
     setComment((prev) => `${prev}${prev ? " " : ""}${voiceText}`);
   }, []);
@@ -152,6 +153,12 @@ export const RegionDetailsMeta: FC<RegionDetailsMetaProps> = observer(({ region,
     }
   }, [editMode]);
 
+  useEffect(() => {
+    if (region.isReadOnly() && editMode) {
+      cancelEditMode?.();
+    }
+  }, [region.locked, editMode]);
+
   return (
     <>
       {editMode && (
@@ -160,14 +167,28 @@ export const RegionDetailsMeta: FC<RegionDetailsMetaProps> = observer(({ region,
             ref={(el) => (input.current = el)}
             placeholder="Add comment"
             value={comment}
+            readOnly={region.isReadOnly()}
             onChange={(e) => setComment(e.target.value)}
+            onBlur={(e) => {
+              if (ignoreBlurRef.current) {
+                ignoreBlurRef.current = false;
+                return;
+              }
+              if (!e.target.value.trim()) {
+                cancelEditMode?.();
+              }
+            }}
           />
           <button
             type="button"
             onMouseDown={(e) => {
               e.preventDefault();
             }}
-            onClick={() => setRecorderVisible(true)}
+            onClick={() => {
+              ignoreBlurRef.current = true;
+              setRecorderVisible(true);
+            }}
+            disabled={region.isReadOnly()}
             className={bem.elem("voice").toClassName()}
             aria-label="Voice input"
           >
@@ -182,6 +203,7 @@ export const RegionDetailsMeta: FC<RegionDetailsMetaProps> = observer(({ region,
               saveComment(comment);
               cancelEditMode?.();
             }}
+            disabled={region.isReadOnly()}
             className={bem.elem("save").toClassName()}
             aria-label="Save comment"
           >
@@ -204,6 +226,7 @@ export const RegionDetailsMeta: FC<RegionDetailsMetaProps> = observer(({ region,
                   aria-label="Delete comment"
                   className={metaBem.elem("comment-delete").toClassName()}
                   onClick={() => region.deleteMetaComment(c.datetime)}
+                  disabled={region.isReadOnly()}
                 >
                   <IconTrash width={12} height={12} />
                 </button>
