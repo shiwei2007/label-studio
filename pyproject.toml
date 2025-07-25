@@ -1,9 +1,9 @@
 [project]
 name = "label-studio"
-version = "1.21.0.dev0"
+version = "1.0.0."
 description = "Label Studio annotation tool"
 authors = [
-    { name = "HumanSignal", email = "support@humansignal.com" },
+    { name = "ShiWei", email = "shiwei2007@gmail.com" },
 ]
 readme = "README.md"
 license = "Apache-2.0"
@@ -79,7 +79,7 @@ dependencies = [
 ]
 
 [project.urls]
-Repository = "https://github.com/HumanSignal/label-studio"
+Repository = "https://github.com/shiwei2007/label-studio"
 
 [project.scripts]
 label-studio = "label_studio.server:main"
