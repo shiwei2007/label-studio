@@ -6,6 +6,7 @@ import { RegionEditor } from "./RegionEditor";
 import "./RegionDetails.scss";
 import { Typography } from "@humansignal/ui";
 import { IconMicrophone, IconTrash, IconSave } from "@humansignal/icons";
+import { TextArea } from "../../../common/TextArea/TextArea";
 import { SpeechRecorderModal } from "../../SpeechRecorder/SpeechRecorderModal";
 
 const TextResult: FC<{ mainValue: string[] }> = observer(({ mainValue }) => {
@@ -163,12 +164,15 @@ export const RegionDetailsMeta: FC<RegionDetailsMetaProps> = observer(({ region,
     <>
       {editMode && (
         <div className={bem.elem("meta-text").toClassName()}>
-          <textarea
-            ref={(el) => (input.current = el)}
+          <TextArea
+            ref={(el) => (input.current = el as HTMLTextAreaElement)}
             placeholder="Add comment"
             value={comment}
+            autoSize
+            rows={2}
+            maxRows={Number.POSITIVE_INFINITY}
             readOnly={region.isReadOnly()}
-            onChange={(e) => setComment(e.target.value)}
+            onChange={(val) => setComment(val)}
             onBlur={(e) => {
               if (ignoreBlurRef.current) {
                 ignoreBlurRef.current = false;

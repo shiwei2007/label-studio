@@ -68,7 +68,7 @@ export const panelState = {
       relativeLeft: 0,
       relativeTop: 0,
       zIndex: 10,
-      width: 320,
+      width: 600,
       height: 385,
       visible: true,
       detached: false,

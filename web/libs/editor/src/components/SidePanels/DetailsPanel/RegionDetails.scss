@@ -63,12 +63,14 @@
     border-radius: 4px;
     background-color: var(--color-neutral-surface);
 
-    textarea {
+    textarea,
+    .textarea {
       width: 100%;
       border: none;
       background: transparent;
       resize: none;
       outline: none;
+      padding: 0 0 24px;
     }
 
     button {
