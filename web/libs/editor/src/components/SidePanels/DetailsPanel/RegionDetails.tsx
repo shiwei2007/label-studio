@@ -1,9 +1,13 @@
 import { observer } from "mobx-react";
-import { type FC, useEffect, useMemo, useRef } from "react";
-import { Block, Elem, useBEM } from "../../../utils/bem";
+import { type FC, useEffect, useMemo, useRef, useState, useCallback } from "react";
+import { getRoot } from "mobx-state-tree";
+import { Block, Elem, cn, useBEM } from "../../../utils/bem";
 import { RegionEditor } from "./RegionEditor";
 import "./RegionDetails.scss";
 import { Typography } from "@humansignal/ui";
+import { IconMicrophone, IconTrash, IconSave } from "@humansignal/icons";
+import { TextArea } from "../../../common/TextArea/TextArea";
+import { SpeechRecorderModal } from "../../SpeechRecorder/SpeechRecorderModal";
 
 const TextResult: FC<{ mainValue: string[] }> = observer(({ mainValue }) => {
   return (
@@ -117,56 +121,129 @@ type RegionDetailsMetaProps = {
   region: any;
   editMode?: boolean;
   cancelEditMode?: () => void;
-  enterEditMode?: () => void;
 };
 
-export const RegionDetailsMeta: FC<RegionDetailsMetaProps> = observer(
-  ({ region, editMode, cancelEditMode, enterEditMode }) => {
-    const bem = useBEM();
-    const input = useRef<HTMLTextAreaElement | null>();
+export const RegionDetailsMeta: FC<RegionDetailsMetaProps> = observer(({ region, editMode, cancelEditMode }) => {
+  const bem = useBEM();
+  const metaBem = cn("region-meta");
+  const input = useRef<HTMLTextAreaElement | null>();
+  const [comment, setComment] = useState("");
+  const currentUser = getRoot(region).user;
 
-    const saveMeta = (value: string) => {
-      region.setMetaText(value);
-    };
+  const saveComment = (value: string) => {
+    const text = value.trim();
+    if (text && !region.isReadOnly()) {
+      const user = currentUser?.displayName || currentUser?.username || "User";
+      region.addMetaComment(user, text);
+    }
+    setComment("");
+  };
 
-    useEffect(() => {
-      if (editMode && input.current) {
-        const { current } = input;
+  const [recorderVisible, setRecorderVisible] = useState(false);
+  const ignoreBlurRef = useRef(false);
+  const appendVoiceText = useCallback((voiceText: string) => {
+    setComment((prev) => `${prev}${prev ? " " : ""}${voiceText}`);
+  }, []);
 
-        current.focus();
-        current.setSelectionRange(current.value.length, current.value.length);
-      }
-    }, [editMode]);
+  useEffect(() => {
+    if (editMode && input.current) {
+      const { current } = input;
 
-    return (
-      <>
-        {editMode ? (
-          <textarea
-            ref={(el) => (input.current = el)}
-            placeholder="Meta"
-            className={bem.elem("meta-text").toClassName()}
-            value={region.meta.text}
-            onChange={(e) => saveMeta(e.target.value)}
+      current.focus();
+      current.setSelectionRange(current.value.length, current.value.length);
+    }
+  }, [editMode]);
+
+  useEffect(() => {
+    if (region.isReadOnly() && editMode) {
+      cancelEditMode?.();
+    }
+  }, [region.locked, editMode]);
+
+  return (
+    <>
+      {editMode && (
+        <div className={bem.elem("meta-text").toClassName()}>
+          <TextArea
+            ref={(el) => (input.current = el as HTMLTextAreaElement)}
+            placeholder="Add comment"
+            value={comment}
+            autoSize
+            rows={2}
+            maxRows={Number.POSITIVE_INFINITY}
+            readOnly={region.isReadOnly()}
+            onChange={(val) => setComment(val)}
             onBlur={(e) => {
-              saveMeta(e.target.value);
-              cancelEditMode?.();
-            }}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault();
-                saveMeta(e.target.value);
+              if (ignoreBlurRef.current) {
+                ignoreBlurRef.current = false;
+                return;
+              }
+              if (!e.target.value.trim()) {
                 cancelEditMode?.();
               }
             }}
           />
-        ) : (
-          region.meta?.text && (
-            <Elem name="meta-text" onClick={() => enterEditMode?.()}>
-              {region.meta?.text}
-            </Elem>
-          )
-        )}
-      </>
-    );
-  },
-);
+          <button
+            type="button"
+            onMouseDown={(e) => {
+              e.preventDefault();
+            }}
+            onClick={() => {
+              ignoreBlurRef.current = true;
+              setRecorderVisible(true);
+            }}
+            disabled={region.isReadOnly()}
+            className={bem.elem("voice").toClassName()}
+            aria-label="Voice input"
+          >
+            <IconMicrophone width={16} height={16} />
+          </button>
+          <button
+            type="button"
+            onMouseDown={(e) => {
+              e.preventDefault();
+            }}
+            onClick={() => {
+              saveComment(comment);
+              cancelEditMode?.();
+            }}
+            disabled={region.isReadOnly()}
+            className={bem.elem("save").toClassName()}
+            aria-label="Save comment"
+          >
+            <IconSave width={16} height={16} />
+          </button>
+        </div>
+      )}
+      {region.meta?.comments?.length ? (
+        <div className={metaBem.elem("comments").toClassName()}>
+          {[...region.meta.comments]
+            .sort((a: any, b: any) => new Date(b.datetime).getTime() - new Date(a.datetime).getTime())
+            .map((c: any, i: number) => (
+              <div className={metaBem.elem("comment").toClassName()} key={i}>
+                <div className={metaBem.elem("comment-head").toClassName()}>
+                  <span>{c.user}</span>
+                  <time>{new Date(c.datetime).toLocaleDateString()}</time>
+                </div>
+                <button
+                  type="button"
+                  aria-label="Delete comment"
+                  className={metaBem.elem("comment-delete").toClassName()}
+                  onClick={() => region.deleteMetaComment(c.datetime)}
+                  disabled={region.isReadOnly()}
+                >
+                  <IconTrash width={12} height={12} />
+                </button>
+                <div className={metaBem.elem("comment-text").toClassName()}>{c.text}</div>
+              </div>
+            ))}
+        </div>
+      ) : null}
+      <SpeechRecorderModal
+        visible={recorderVisible}
+        onCancel={() => setRecorderVisible(false)}
+        onDone={appendVoiceText}
+      />
+    </>
+  );
+});

@@ -169,28 +169,13 @@ export const enterprisePanelDefault: Record<string, PanelBBox> = {
     relativeLeft: 0,
     relativeTop: 0,
     zIndex: 10,
-    width: DEFAULT_PANEL_WIDTH,
+    width: 600,
     height: DEFAULT_PANEL_HEIGHT,
     visible: true,
     detached: false,
     alignment: Side.right,
     maxHeight: DEFAULT_PANEL_MAX_HEIGHT,
     panelViews: [panelViews[3], panelViews[4], panelViews[1]],
-  },
-  "regions-relations": {
-    order: 2,
-    top: 0,
-    left: 0,
-    relativeLeft: 0,
-    relativeTop: 0,
-    zIndex: 10,
-    width: DEFAULT_PANEL_WIDTH,
-    height: DEFAULT_PANEL_HEIGHT,
-    visible: true,
-    detached: false,
-    alignment: Side.right,
-    maxHeight: DEFAULT_PANEL_MAX_HEIGHT,
-    panelViews: [panelViews[0], panelViews[2]],
   },
 };
 
@@ -202,28 +187,13 @@ export const openSourcePanelDefault: Record<string, PanelBBox> = {
     relativeLeft: 0,
     relativeTop: 0,
     zIndex: 10,
-    width: DEFAULT_PANEL_WIDTH,
+    width: 600,
     height: DEFAULT_PANEL_HEIGHT,
     visible: true,
     detached: false,
     alignment: Side.right,
     maxHeight: DEFAULT_PANEL_MAX_HEIGHT,
     panelViews: [panelViews[3], panelViews[1]],
-  },
-  "regions-relations": {
-    order: 2,
-    top: 0,
-    left: 0,
-    relativeLeft: 0,
-    relativeTop: 0,
-    zIndex: 10,
-    width: DEFAULT_PANEL_WIDTH,
-    height: DEFAULT_PANEL_HEIGHT,
-    visible: true,
-    detached: false,
-    alignment: Side.right,
-    maxHeight: DEFAULT_PANEL_MAX_HEIGHT,
-    panelViews: [panelViews[0], panelViews[2]],
   },
 };
 
@@ -275,9 +245,12 @@ export const restorePanel = (showComments: boolean): StoredPanelState => {
   // don't use comments tab anywhere if it's disabled
   const countOfAllAvailableTabs = panelViews.length - (showComments ? 0 : 1);
 
+  const outdatedState = allTabs && allTabs.some((view) => ["regions", "relations"].includes(view.name));
+
   // stored state can have less tabs than available, for example if it was stored on old version
-  // or if comments were enabled; then return default state
-  if (!allTabs || allTabs.length !== countOfAllAvailableTabs) {
+  // or if comments were enabled, or if outdated tabs like Regions or Relations are present;
+  // then return default state
+  if (!allTabs || allTabs.length !== countOfAllAvailableTabs || outdatedState) {
     const defaultPanel = showComments ? enterprisePanelDefault : openSourcePanelDefault;
 
     return { panelData: defaultPanel, collapsedSide: defaultCollapsedSide };

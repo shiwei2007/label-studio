@@ -12,6 +12,7 @@ import { LinkState } from "./LinkState";
 import "./CommentForm.scss";
 import { NewTaxonomy as Taxonomy, type TaxonomyPath } from "../../../components/NewTaxonomy/NewTaxonomy";
 import { CommentFormButtons } from "./CommentFormButtons";
+import { useSpeechRecognition } from "../../../hooks/useSpeechRecognition";
 import { taxonomyPathsToSelectedItems, COMMENT_TAXONOMY_OPTIONS } from "../../../utils/commentClassification";
 
 export type CommentFormProps = {
@@ -123,6 +124,29 @@ export const CommentForm: FC<CommentFormProps> = observer(({ commentStore, annot
   const selections = useMemo(() => taxonomyPathsToSelectedItems(classifications?.default?.values), [classifications]);
   const classificationsItems = commentStore.commentClassificationsItems;
 
+  const onVoiceResult = useCallback(
+    (voiceText: string) => {
+      const current = getCurrentComment();
+      const existing = current.text ?? "";
+      current.setText(`${existing}${existing ? " " : ""}${voiceText}`);
+    },
+    [getCurrentComment],
+  );
+
+  const {
+    start: startVoice,
+    stop: stopVoice,
+    listening,
+    supported,
+  } = useSpeechRecognition({
+    onResult: onVoiceResult,
+  });
+
+  const toggleVoice = useCallback(() => {
+    if (listening) stopVoice();
+    else startVoice();
+  }, [listening, startVoice, stopVoice]);
+
   const updateCommentClassifications = useCallback(
     (classifications: object | null) => {
       const currentComment = getCurrentComment();
@@ -162,7 +186,13 @@ export const CommentForm: FC<CommentFormProps> = observer(({ commentStore, annot
           onBlur={clearTooltipMessage}
         />
         {classificationsItems.length === 0 && (
-          <CommentFormButtons region={region} linking={linking} onLinkTo={linkToHandler} />
+          <CommentFormButtons
+            region={region}
+            linking={linking}
+            onLinkTo={linkToHandler}
+            onVoice={supported ? toggleVoice : undefined}
+            voiceActive={listening}
+          />
         )}
       </Elem>
       {classificationsItems.length > 0 && (
@@ -176,7 +206,13 @@ export const CommentForm: FC<CommentFormProps> = observer(({ commentStore, annot
               defaultSearch={false}
             />
           </Elem>
-          <CommentFormButtons region={region} linking={linking} onLinkTo={linkToHandler} />
+          <CommentFormButtons
+            region={region}
+            linking={linking}
+            onLinkTo={linkToHandler}
+            onVoice={supported ? toggleVoice : undefined}
+            voiceActive={listening}
+          />
         </Elem>
       )}
       {hasLinkState && (

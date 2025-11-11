@@ -1,5 +1,12 @@
 @import '../themes/default/variables';
 
+html,
+body {
+  /* Prevent trackpad swipe from navigating browser history */
+  overscroll-behavior-x: none;
+  touch-action: pan-y;
+}
+
 body {
   --header-height: 48px;
   --menu-animation-duration: 0.15s;

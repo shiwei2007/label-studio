@@ -9,7 +9,7 @@ import { types } from "mobx-state-tree";
  */
 const NormalizationMixin = types
   .model({
-    meta: types.frozen<{ text?: string[] }>({}),
+    meta: types.frozen<{ text?: string[]; comments?: { user: string; text: string; datetime: string }[] }>({}),
   })
   .actions((self) => ({
     /**
@@ -33,6 +33,26 @@ const NormalizationMixin = types
      */
     deleteMetaText() {
       self.setMetaText("");
+    },
+
+    addMetaComment(user: string, text: string) {
+      if (!text) return;
+      const comments = self.meta?.comments ?? [];
+      self.meta = {
+        ...self.meta,
+        comments: [...comments, { user, text, datetime: new Date().toISOString() }],
+      };
+    },
+
+    deleteMetaComment(datetime: string) {
+      const comments = self.meta?.comments ?? [];
+      const updated = comments.filter((c: any) => c.datetime !== datetime);
+      const next = { ...self.meta } as any;
+
+      if (updated.length > 0) next.comments = updated;
+      else delete next.comments;
+
+      self.meta = next;
     },
   }));
 

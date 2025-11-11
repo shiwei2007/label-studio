@@ -54,35 +54,47 @@
   }
 
   &__meta-text {
-    width: calc(100% - 16px);
-    border: 1px solid transparent;
-    margin: 0 8px;
+    position: relative;
+    border: 1px solid var(--color-neutral-border);
+    margin: 0 8px 8px;
+    width: auto;
     padding: 4px 8px;
     min-height: 64px;
     border-radius: 4px;
-    outline: none;
     background-color: var(--color-neutral-surface);
-    transition-property: background-color, border-color;
-    transition-duration: 80ms;
-    transition-timing-function: ease;
 
-    &:hover {
-      textarea {
-        border-color: var(--color-neutral-border);
-        background-color: var(--color-neutral-background);
+    textarea,
+    .textarea {
+      width: 100%;
+      border: none;
+      background: transparent;
+      resize: none;
+      outline: none;
+      padding: 0 0 24px;
+    }
+
+    button {
+      position: absolute;
+      bottom: 4px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      color: inherit;
+      padding: 2px;
+
+      svg {
+        width: 16px;
+        height: 16px;
       }
     }
+  }
 
-    &:focus {
-      background-color: var(--color-neutral-background);
-      border-color: var(--color-primary-border-subtle);
-      box-shadow: 0 0 0 1px var(--color-primary-border-subtle);
-    }
+  &__voice {
+    right: 28px;
+  }
 
-    &:not(textarea) {
-      white-space: pre-wrap;
-      word-break: break-all;
-    }
+  &__save {
+    right: 4px;
   }
 
   &_compact &__head {
@@ -157,6 +169,61 @@
         content: attr(data-counter);
         opacity: 0.6;
       }
+    }
+  }
+
+  &__comments {
+    margin: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  &__comment {
+    padding: 4px 8px;
+    border-radius: 4px;
+    background-color: var(--color-neutral-surface);
+    border: 1px solid var(--color-neutral-border);
+    white-space: pre-wrap;
+    position: relative;
+  }
+
+  &__comment-head {
+    display: flex;
+    align-items: center;
+    color: var(--color-neutral-content-subtle);
+    font-size: 12px;
+    margin-bottom: 4px;
+
+    time {
+      margin-left: auto;
+      margin-right: 16px; // avoid overlap with delete icon
+    }
+  }
+
+  &__comment-text {
+    white-space: pre-wrap;
+  }
+
+  &__comment-delete {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--color-neutral-content-subtle);
+    padding: 2px;
+
+    svg {
+      width: 12px;
+      height: 12px;
+    }
+
+    &[disabled] {
+      opacity: 0.5;
+      cursor: not-allowed;
+      pointer-events: none;
     }
   }
 }

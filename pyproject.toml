@@ -1,9 +1,9 @@
 [project]
 name = "label-studio"
-version = "1.21.0"
+version = "1.0.1+sportifAI"
 description = "Label Studio annotation tool"
 authors = [
-    { name = "HumanSignal", email = "support@humansignal.com" },
+    { name = "ShiWei", email = "shiwei2007@gmail.com" },
 ]
 readme = "README.md"
 license = "Apache-2.0"
@@ -75,10 +75,11 @@ dependencies = [
     ## HumanSignal repo dependencies :start
     "label-studio-sdk (==2.0.4)",
     ## HumanSignal repo dependencies :end
+    #"label-studio-sdk (>=1.0.19,<2.0.0)"
 ]
 
 [project.urls]
-Repository = "https://github.com/HumanSignal/label-studio"
+Repository = "https://github.com/shiwei2007/label-studio"
 
 [project.scripts]
 label-studio = "label_studio.server:main"
@@ -237,6 +238,10 @@ factory-boy = "^3.3.3"
 [tool.poetry.group.build.dependencies]
 twine = ">=6.1.0"
 packaging = ">=24.2"
+
+
+[tool.poetry.group.dev.dependencies]
+label-studio-sdk = "2.0.4"
 
 [build-system]
 requires = ['poetry-core (>=2.0.0,<3.0.0)']

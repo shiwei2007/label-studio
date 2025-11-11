@@ -262,3 +262,5 @@ export { ReactComponent as IconCloudProviderRedis } from "./cloud-provider-redis
 export { ReactComponent as IconCloudProviderGCS } from "./cloud-provider-gcs.svg";
 export { ReactComponent as IconCloudProviderAzure } from "./cloud-provider-azure.svg";
 export { ReactComponent as IconCloudProviderDatabricks } from "./cloud-provider-databricks.svg";
+export { ReactComponent as IconMicrophone } from "./microphone.svg";
+export { ReactComponent as IconSave } from "./save.svg";
