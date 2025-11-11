@@ -1,13 +1,16 @@
+import { IconEyeClosed, IconEyeOpened, IconPlus, IconRelationLink, IconTrash, IconWarning } from "@humansignal/icons";
+import { Button, type ButtonProps } from "@humansignal/ui";
 import chroma from "chroma-js";
 import { observer } from "mobx-react";
 import { type FC, forwardRef, useMemo, useState } from "react";
+import { WithHotkey } from "../../../common/Hotkey/WithHotkey";
+import { CREATE_RELATION_MODE } from "../../../stores/Annotation/LinkingModes";
 import { IconPlus, IconTrash, IconWarning } from "@humansignal/icons";
 import { Button, type ButtonProps } from "@humansignal/ui";
 import { Block, Elem } from "../../../utils/bem";
 import { NodeIcon } from "../../Node/Node";
 import { LockButton } from "../Components/LockButton";
 import { RegionLabels } from "./RegionLabels";
-import { WithHotkey } from "../../../common/Hotkey/WithHotkey";
 
 interface RegionItemProps {
   region: any;
@@ -15,7 +18,12 @@ interface RegionItemProps {
   compact?: boolean;
   withIds?: boolean;
   mainDetails?: FC<{ region: any }>;
-  metaDetails?: FC<{ region: any; editMode?: boolean; cancelEditMode?: () => void; enterEditMode: () => void }>;
+  metaDetails?: FC<{
+    region: any;
+    editMode?: boolean;
+    cancelEditMode?: () => void;
+    enterEditMode: () => void;
+  }>;
 }
 
 export const RegionItem: FC<RegionItemProps> = observer(
@@ -123,13 +131,17 @@ const RegionAction: FC<any> = observer(({ region, annotation, editMode, onEditMo
           locked={region?.locked}
           onClick={() => region.setLocked(!region.locked)}
           displayedHotkey="region:lock"
+          variant="neutral"
           look="string"
-          style={{ width: 36, height: 32 }}
+          aria-label="Unlock Region"
+          tooltip="Unlock Region"
         />
         <RegionActionButton
           variant="negative"
+          look="string"
           aria-label="Delete selected region"
           disabled={region.isReadOnly()}
+          tooltip="Delete selected region"
           onClick={() => annotation.deleteRegion(region)}
         >
           <IconTrash />
