@@ -1,19 +1,14 @@
 import { createContext, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { StaticContent } from "../../app/StaticContent/StaticContent";
 import {
-  IconBook,
   IconFolder,
   IconHome,
   IconHotkeys,
   IconPersonInCircle,
   IconPin,
-  IconTerminal,
   IconDoor,
-  IconGithub,
   IconSettings,
-  IconSlack,
 } from "@humansignal/icons";
-import { LSLogo } from "../../assets/images";
 import { Button, Userpic, ThemeToggle } from "@humansignal/ui";
 import { useConfig } from "../../providers/ConfigProvider";
 import { useContextComponent, useFixedLocation } from "../../providers/RoutesProvider";
@@ -24,7 +19,6 @@ import { Breadcrumbs } from "../Breadcrumbs/Breadcrumbs";
 import { Dropdown } from "../Dropdown/Dropdown";
 import { Hamburger } from "../Hamburger/Hamburger";
 import { Menu } from "../Menu/Menu";
-import { VersionNotifier, VersionProvider } from "../VersionNotifier/VersionNotifier";
 import "./Menubar.scss";
 import "./MenuContent.scss";
 import "./MenuSidebar.scss";
@@ -139,7 +133,9 @@ export const Menubar = ({ enabled, defaultOpened, defaultPinned, children, onSid
         <div className={menubarClass}>
           <Dropdown.Trigger dropdown={menuDropdownRef} closeOnClickOutside={!sidebarPinned}>
             <div className={`${menubarClass.elem("trigger")} main-menu-trigger`}>
-              <LSLogo className={`${menubarClass.elem("logo")}`} alt="Label Studio Logo" />
+              <span className={`${menubarClass.elem("logo")}`} aria-label="SportifyAI Data Logo">
+                SportifyAI Data
+              </span>
               <Hamburger opened={sidebarOpened} />
             </div>
           </Dropdown.Trigger>
@@ -208,71 +204,41 @@ export const Menubar = ({ enabled, defaultOpened, defaultPinned, children, onSid
         </div>
       )}
 
-      <VersionProvider>
-        <div className={contentClass.elem("body")}>
-          {enabled && (
-            <Dropdown
-              ref={menuDropdownRef}
-              onToggle={sidebarToggle}
-              onVisibilityChanged={() => window.dispatchEvent(new Event("resize"))}
-              visible={sidebarOpened}
-              className={[sidebarClass, sidebarClass.mod({ floating: !sidebarPinned })].join(" ")}
-              style={{ width: 240 }}
-            >
-              <Menu>
-                {isFF(FF_HOMEPAGE) && <Menu.Item label="Home" to="/" icon={<IconHome />} data-external exact />}
-                <Menu.Item label="Projects" to="/projects" icon={<IconFolder />} data-external exact />
-                <Menu.Item label="Organization" to="/organization" icon={<IconPersonInCircle />} data-external exact />
+      <div className={contentClass.elem("body")}>
+        {enabled && (
+          <Dropdown
+            ref={menuDropdownRef}
+            onToggle={sidebarToggle}
+            onVisibilityChanged={() => window.dispatchEvent(new Event("resize"))}
+            visible={sidebarOpened}
+            className={[sidebarClass, sidebarClass.mod({ floating: !sidebarPinned })].join(" ")}
+            style={{ width: 240 }}
+          >
+            <Menu>
+              {isFF(FF_HOMEPAGE) && <Menu.Item label="Home" to="/" icon={<IconHome />} data-external exact />}
+              <Menu.Item label="Projects" to="/projects" icon={<IconFolder />} data-external exact />
+              <Menu.Item label="Organization" to="/organization" icon={<IconPersonInCircle />} data-external exact />
 
-                <Menu.Spacer />
+              <Menu.Divider />
 
-                <VersionNotifier showNewVersion />
+              <Menu.Item
+                icon={<IconPin />}
+                className={sidebarClass.elem("pin")}
+                onClick={sidebarPin}
+                active={sidebarPinned}
+              >
+                {sidebarPinned ? "Unpin menu" : "Pin menu"}
+              </Menu.Item>
+            </Menu>
+          </Dropdown>
+        )}
 
-                <Menu.Item
-                  label="API"
-                  href="https://api.labelstud.io/api-reference/introduction/getting-started"
-                  icon={<IconTerminal />}
-                  target="_blank"
-                />
-                <Menu.Item label="Docs" href="https://labelstud.io/guide" icon={<IconBook />} target="_blank" />
-                <Menu.Item
-                  label="GitHub"
-                  href="https://github.com/HumanSignal/label-studio"
-                  icon={<IconGithub />}
-                  target="_blank"
-                  rel="noreferrer"
-                />
-                <Menu.Item
-                  label="Slack Community"
-                  href="https://slack.labelstud.io/?source=product-menu"
-                  icon={<IconSlack />}
-                  target="_blank"
-                  rel="noreferrer"
-                />
-
-                <VersionNotifier showCurrentVersion />
-
-                <Menu.Divider />
-
-                <Menu.Item
-                  icon={<IconPin />}
-                  className={sidebarClass.elem("pin")}
-                  onClick={sidebarPin}
-                  active={sidebarPinned}
-                >
-                  {sidebarPinned ? "Unpin menu" : "Pin menu"}
-                </Menu.Item>
-              </Menu>
-            </Dropdown>
-          )}
-
-          <MenubarContext.Provider value={providerValue}>
-            <div className={contentClass.elem("content").mod({ withSidebar: sidebarPinned && sidebarOpened })}>
-              {children}
-            </div>
-          </MenubarContext.Provider>
-        </div>
-      </VersionProvider>
+        <MenubarContext.Provider value={providerValue}>
+          <div className={contentClass.elem("content").mod({ withSidebar: sidebarPinned && sidebarOpened })}>
+            {children}
+          </div>
+        </MenubarContext.Provider>
+      </div>
     </div>
   );
 };
