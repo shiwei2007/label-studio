@@ -1,3 +1,4 @@
+import { observer } from "mobx-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { IconZoomIn } from "@humansignal/icons";
@@ -6,6 +7,7 @@ import { Dropdown } from "../../../common/Dropdown/Dropdown";
 import { Menu } from "../../../common/Menu/Menu";
 import { ErrorMessage } from "../../../components/ErrorMessage/ErrorMessage";
 import ObjectTag from "../../../components/Tags/Object";
+import { VideoConfigControl } from "../../../components/Timeline/Controls/VideoConfigControl";
 import { Timeline } from "../../../components/Timeline/Timeline";
 import { clampZoom, VideoCanvas } from "../../../components/VideoCanvas/VideoCanvas";
 import {
@@ -22,6 +24,9 @@ import ResizeObserver from "../../../utils/resize-observer";
 import { clamp, isDefined } from "../../../utils/utilities";
 import "./Video.scss";
 import { VideoRegions } from "./VideoRegions";
+import { ff } from "@humansignal/core";
+
+const isSyncedBuffering = ff.isActive(ff.FF_SYNCED_BUFFERING);
 
 function useZoom(videoDimensions, canvasDimentions, shouldClampPan) {
   const [zoomState, setZoomState] = useState({ zoom: 1, pan: { x: 0, y: 0 } });
@@ -108,6 +113,21 @@ function useZoom(videoDimensions, canvasDimentions, shouldClampPan) {
 
   return [zoomState, { setZoomAndPan, setZoom, setPan }];
 }
+
+const VideoConfig = observer(({ item }) => {
+  const [isConfigModalActive, setIsConfigModalActive] = useState(false);
+
+  return (
+    <VideoConfigControl
+      configModal={isConfigModalActive}
+      onSetModal={setIsConfigModalActive}
+      speed={item.speed}
+      onSpeedChange={item.handleSpeed}
+      loopTimelineRegion={item.loopTimelineRegion}
+      onLoopTimelineRegionChange={item.setLoopTimelineRegion}
+    />
+  );
+});
 
 const HtxVideoView = ({ item, store }) => {
   if (!item._value) return null;
@@ -357,7 +377,7 @@ const HtxVideoView = ({ item, store }) => {
       }
       return true;
     });
-  }, []);
+  }, [item]);
 
   const handlePause = useCallback(() => {
     setPlaying((_playing) => {
@@ -368,6 +388,22 @@ const HtxVideoView = ({ item, store }) => {
       return false;
     });
   }, []);
+
+  const handlePlayClick = useCallback(() => {
+    if (isSyncedBuffering && item.isBuffering) {
+      item.triggerSyncPlay(true);
+    } else {
+      handlePlay();
+    }
+  }, []);
+
+  const handlePauseClick = useCallback(() => {
+    if (isSyncedBuffering && item.isBuffering) {
+      item.triggerSyncPause(true);
+    } else {
+      handlePause();
+    }
+  });
 
   const handleSelectRegion = useCallback(
     (_, id, select) => {
@@ -499,6 +535,7 @@ const HtxVideoView = ({ item, store }) => {
                   pan={pan}
                   speed={item.speed}
                   framerate={item.framerate}
+                  buffering={item.isBuffering}
                   allowInteractions={false}
                   allowPanOffscreen={!limitCanvasDrawingBoundaries}
                   onFrameChange={handleFrameChange}
@@ -509,6 +546,9 @@ const HtxVideoView = ({ item, store }) => {
                   onPlay={handlePlay}
                   onPause={handlePause}
                   onSeeked={item.handleSeek}
+                  onBuffering={item.handleBuffering}
+                  loopFrameRange={item.loopTimelineRegion}
+                  selectedFrameRange={item.selectedFrameRange}
                 />
               </>
             )}
@@ -519,7 +559,8 @@ const HtxVideoView = ({ item, store }) => {
           <Elem
             name="timeline"
             tag={Timeline}
-            playing={playing}
+            playing={isSyncedBuffering && item.isBuffering ? item.wasPlayingBeforeBuffering : playing}
+            buffering={isSyncedBuffering ? item.isBuffering : false}
             length={videoLength}
             position={position}
             regions={regions}
@@ -537,29 +578,32 @@ const HtxVideoView = ({ item, store }) => {
                 position: "left",
                 component: () => {
                   return (
-                    <Dropdown.Trigger
-                      key="dd"
-                      inline={isFullScreen}
-                      content={
-                        <Menu size="auto" closeDropdownOnItemClick={false}>
-                          <Menu.Item onClick={zoomIn}>Zoom In</Menu.Item>
-                          <Menu.Item onClick={zoomOut}>Zoom Out</Menu.Item>
-                          <Menu.Item onClick={zoomToFit}>Zoom To Fit</Menu.Item>
-                          <Menu.Item onClick={zoomReset}>Zoom 100%</Menu.Item>
-                        </Menu>
-                      }
-                    >
-                      <Button size="small" variant="neutral" look="string">
-                        <IconZoomIn />
-                      </Button>
-                    </Dropdown.Trigger>
+                    <>
+                      <VideoConfig item={item} />
+                      <Dropdown.Trigger
+                        key="dd"
+                        inline={isFullScreen}
+                        content={
+                          <Menu size="auto" closeDropdownOnItemClick={false}>
+                            <Menu.Item onClick={zoomIn}>Zoom In</Menu.Item>
+                            <Menu.Item onClick={zoomOut}>Zoom Out</Menu.Item>
+                            <Menu.Item onClick={zoomToFit}>Zoom To Fit</Menu.Item>
+                            <Menu.Item onClick={zoomReset}>Zoom 100%</Menu.Item>
+                          </Menu>
+                        }
+                      >
+                        <Button size="small" variant="neutral" look="string">
+                          <IconZoomIn />
+                        </Button>
+                      </Dropdown.Trigger>
+                    </>
                   );
                 },
               },
             ]}
             onPositionChange={handleTimelinePositionChange}
-            onPlay={handlePlay}
-            onPause={handlePause}
+            onPlay={handlePlayClick}
+            onPause={handlePauseClick}
             onFullscreenToggle={handleFullscreenToggle}
             onSelectRegion={handleSelectRegion}
             onStartDrawing={item.startDrawing}

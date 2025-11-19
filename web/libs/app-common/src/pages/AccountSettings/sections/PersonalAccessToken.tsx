@@ -1,15 +1,13 @@
-import { IconLaunch, IconFileCopy, Label, Typography } from "@humansignal/ui";
-import styles from "./PersonalAccessToken.module.scss";
-import { atomWithMutation, atomWithQuery } from "jotai-tanstack-query";
-import { atom, useAtomValue } from "jotai";
-import { Button } from "@humansignal/ui";
-import { useCopyText } from "@humansignal/core/lib/hooks/useCopyText";
-
+import { useCopyText } from "@humansignal/core";
+import { Button, IconFileCopy, IconLaunch, Label, Typography } from "@humansignal/ui";
 /**
  * FIXME: This is legacy imports. We're not supposed to use such statements
  * each one of these eventually has to be migrated to core/ui
  */
 import { Input, TextArea } from "apps/labelstudio/src/components/Form";
+import { atom, useAtomValue } from "jotai";
+import { atomWithMutation, atomWithQuery } from "jotai-tanstack-query";
+import styles from "./PersonalAccessToken.module.scss";
 
 const tokenAtom = atomWithQuery(() => ({
   queryKey: ["access-token"],
@@ -46,8 +44,8 @@ export const PersonalAccessToken = () => {
   const token = useAtomValue(currentTokenAtom);
   const reset = useAtomValue(resetTokenAtom);
   const curl = useAtomValue(curlStringAtom);
-  const [copyToken, tokenCopied] = useCopyText(token);
-  const [copyCurl, curlCopied] = useCopyText(curl);
+  const [copyToken, tokenCopied] = useCopyText({ defaultText: token });
+  const [copyCurl, curlCopied] = useCopyText({ defaultText: curl });
 
   return (
     <div id="personal-access-token">
@@ -58,14 +56,15 @@ export const PersonalAccessToken = () => {
             <Input name="token" className={styles.input} readOnly value={token} />
             <Button
               leading={<IconFileCopy />}
-              onClick={copyToken}
+              onClick={() => copyToken()}
               disabled={tokenCopied}
+              variant="primary"
               look="outlined"
-              variant="neutral"
+              className="w-[116px]"
             >
               {tokenCopied ? "Copied!" : "Copy"}
             </Button>
-            <Button look="outlined" variant="neutral" onClick={() => reset.mutate()}>
+            <Button variant="negative" look="outlined" onClick={() => reset.mutate()}>
               Reset
             </Button>
           </div>
@@ -80,7 +79,14 @@ export const PersonalAccessToken = () => {
               rawClassName={styles.textarea}
               value={curl}
             />
-            <Button icon={<IconFileCopy />} onClick={copyCurl} disabled={curlCopied} look="outlined" variant="neutral">
+            <Button
+              leading={<IconFileCopy />}
+              onClick={() => copyCurl()}
+              disabled={curlCopied}
+              variant="primary"
+              look="outlined"
+              className="w-[116px]"
+            >
               {curlCopied ? "Copied!" : "Copy"}
             </Button>
           </div>

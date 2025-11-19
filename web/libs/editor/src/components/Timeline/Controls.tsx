@@ -50,6 +50,7 @@ export const Controls: FC<TimelineControlsProps> = memo(
     position,
     frameRate = 1024,
     playing,
+    buffering = false,
     collapsed,
     duration,
     extraControls,
@@ -174,6 +175,7 @@ export const Controls: FC<TimelineControlsProps> = memo(
 
     return (
       <Block name="timeline-controls" tag={Space} spread style={{ gridAutoColumns: "auto" }}>
+        {buffering && <Elem name="buffering" aria-label="Buffering Media Source" />}
         {mediaType === "audio" ? (
           renderControls()
         ) : (
@@ -352,9 +354,9 @@ export const Controls: FC<TimelineControlsProps> = memo(
   },
 );
 
-export const ControlButton: FC<ButtonProps & { hotkey?: string }> = ({ children, ...props }) => {
+export const ControlButton: FC<ButtonProps & { hotkey?: string }> = ({ children, hotkey, hotkeyScope, ...props }) => {
   return (
-    <WithHotkey binging={props.hotkey as HotkeyList}>
+    <WithHotkey binging={hotkey as HotkeyList} hotkeyScope={hotkeyScope}>
       <Button {...props} look="string" size="small" variant="neutral">
         {children}
       </Button>

@@ -5,7 +5,7 @@ import { useAtomValue } from "jotai";
 import clsx from "clsx";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { format } from "date-fns";
-import { useCopyText } from "@humansignal/core/lib/hooks/useCopyText";
+import { useCopyText } from "@humansignal/core";
 import styles from "./PersonalJWTToken.module.scss";
 import { Button } from "@humansignal/ui";
 
@@ -177,12 +177,7 @@ export function PersonalJWTToken() {
       </div>
       <Tooltip title="You can only have one active token" disabled={!disallowAddingTokens}>
         <div style={{ width: "max-content" }}>
-          <Button
-            disabled={disallowAddingTokens || dialogOpened}
-            variant="neutral"
-            look="outlined"
-            onClick={openDialog}
-          >
+          <Button disabled={disallowAddingTokens || dialogOpened} onClick={openDialog}>
             Create New Token
           </Button>
         </div>
@@ -193,7 +188,7 @@ export function PersonalJWTToken() {
 
 function CreateTokenForm() {
   const { data, mutate: createToken } = useAtomValue(refreshTokenAtom);
-  const [copy, copied] = useCopyText(data ?? "");
+  const [copy, copied] = useCopyText({ defaultText: data ?? "" });
 
   useEffect(() => {
     createToken();
@@ -211,7 +206,7 @@ function CreateTokenForm() {
           readOnly
           value={data}
         />
-        <Button onClick={copy} disabled={copied} variant="neutral" look="outlined">
+        <Button onClick={() => copy()} disabled={copied} variant="neutral" look="outlined">
           {copied ? "Copied!" : "Copy"}
         </Button>
       </div>
