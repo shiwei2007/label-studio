@@ -284,15 +284,19 @@ label {
 
 .text-wrapper {
   display: flex;
+  flex-direction: column;
   align-items: center;
   gap: 4px;
+  margin-top: 1rem;
   font-size: .875rem;
+  color: var(--color-neutral-content);
+  text-align: center;
 }
 
 .text-wrapper a {
   color: var(--primary_link);
   text-decoration: underline;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .text-wrapper a:hover {
