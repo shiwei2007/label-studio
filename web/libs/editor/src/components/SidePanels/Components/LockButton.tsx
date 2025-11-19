@@ -38,19 +38,37 @@ export const LockButton: FC<{
     const isLocked = locked || item.isReadOnly() || annotation.isReadOnly();
     const isRegionReadonly = item.isReadOnly() && !locked;
 
-  if (isFF(FF_DEV_3873)) {
+    if (isFF(FF_DEV_3873)) {
+      return (
+        <RegionControlButton
+          disabled={isRegionReadonly}
+          onClick={onClick}
+          hotkey={hotkey as HotkeyList}
+          variant={variant}
+          look={look}
+          style={style}
+          aria-label={ariaLabel}
+          tooltip={tooltip}
+        >
+          {isLocked ? <IconLockLocked /> : <IconLockUnlocked />}
+        </RegionControlButton>
+      );
+    }
+
     return (
-      <RegionControlButton
-        disabled={isRegionReadonly}
-        onClick={onClick}
-        displayedHotkey={displayedHotkey}
-        hotkey={hotkey}
-        variant={variant}
-        look={look}
-        style={style}
-      >
-        {isLocked ? <IconLockLocked /> : <IconLockUnlocked />}
-      </RegionControlButton>
+        <RegionControlButton
+          disabled={isRegionReadonly}
+          onClick={onClick}
+          displayedHotkey={displayedHotkey}
+          hotkey={hotkey}
+          variant={variant}
+          look={look}
+          style={style}
+          aria-label={ariaLabel}
+          tooltip={tooltip}
+        >
+          {isLocked ? <IconLockLocked /> : <IconLockUnlocked />}
+        </RegionControlButton>
     );
   },
 );

@@ -1,12 +1,9 @@
-import { IconEyeClosed, IconEyeOpened, IconPlus, IconRelationLink, IconTrash, IconWarning } from "@humansignal/icons";
+import { IconPlus, IconTrash, IconWarning } from "@humansignal/icons";
 import { Button, type ButtonProps } from "@humansignal/ui";
 import chroma from "chroma-js";
 import { observer } from "mobx-react";
 import { type FC, forwardRef, useMemo, useState } from "react";
 import { WithHotkey } from "../../../common/Hotkey/WithHotkey";
-import { CREATE_RELATION_MODE } from "../../../stores/Annotation/LinkingModes";
-import { IconPlus, IconTrash, IconWarning } from "@humansignal/icons";
-import { Button, type ButtonProps } from "@humansignal/ui";
 import { Block, Elem } from "../../../utils/bem";
 import { NodeIcon } from "../../Node/Node";
 import { LockButton } from "../Components/LockButton";
