@@ -133,8 +133,8 @@ export const Menubar = ({ enabled, defaultOpened, defaultPinned, children, onSid
         <div className={menubarClass}>
           <Dropdown.Trigger dropdown={menuDropdownRef} closeOnClickOutside={!sidebarPinned}>
             <div className={`${menubarClass.elem("trigger")} main-menu-trigger`}>
-              <span className={`${menubarClass.elem("logo")}`} aria-label="SportifyAI Data Logo">
-                SportifyAI Data
+              <span className={`${menubarClass.elem("logo")}`} aria-label="SportifAI Data Logo">
+                SportifAI Data
               </span>
               <Hamburger opened={sidebarOpened} />
             </div>

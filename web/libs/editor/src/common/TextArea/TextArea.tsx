@@ -60,14 +60,10 @@ export const TextArea: FC<TextAreaProps> = ({
         if (!textarea || !autoGrowRef.current || !textAreaRef.current) return;
 
         if (autoGrowRef.current.maxHeight === Number.POSITIVE_INFINITY) {
-          textarea.style.height = "auto";
-          const currentValue = textAreaRef.current.value;
-
-          textAreaRef.current.value = "";
-          autoGrowRef.current.lineHeight = textAreaRef.current.scrollHeight / autoGrowRef.current.rows;
+          const computedLineHeight = parseFloat(getComputedStyle(textarea).lineHeight || "0");
+          autoGrowRef.current.lineHeight =
+            computedLineHeight > 0 ? computedLineHeight : textarea.scrollHeight / autoGrowRef.current.rows;
           autoGrowRef.current.maxHeight = autoGrowRef.current.lineHeight * autoGrowRef.current.maxRows;
-
-          textAreaRef.current.value = currentValue;
         }
 
         let newHeight: number;
